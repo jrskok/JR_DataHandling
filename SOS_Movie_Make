@@ -35,4 +35,29 @@ ftp.quit()
 
 
 
-#Kernal 2
+#Kernal 2 Covert images into movie. 
+
+import cv2 #get from https://pypi.org/project/opencv-python/
+import os #Need os import again for file handling
+
+#direct to image folder
+image_folder = '/Users/'
+#create name of video output
+video_name = 'video.avi'
+
+#open images
+images = [img for img in os.listdir(image_folder) if img.endswith(".png")]
+#sort images alphabetically
+images=sorted(images)
+#get specs from images to create movie
+frame = cv2.imread(os.path.join(image_folder, images[0]))
+height, width, layers = frame.shape
+
+#set video, the '5' here is for frames per second. Change as needed. 
+video = cv2.VideoWriter(video_name, 0, 5, (width,height))
+
+for image in images:
+    video.write(cv2.imread(os.path.join(image_folder, image)))
+
+cv2.destroyAllWindows()
+video.release()
