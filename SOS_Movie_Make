@@ -1,1 +1,38 @@
 #SOS_Movie_Make
+#Simple python script used to download images from the NOAA Science on a Sphere webside and compile them into a moive file. 
+#This was developed to create near real-time content for the AstroReality EARTH app. 
+#written for use in Juypter Notebooks. 
+
+#Kernal 1 Downloads the image files from the FTP server.
+
+#Import libraries for FTP transfer 
+from ftplib import FTP
+
+#Import libraries for system search
+import os, sys, os.path
+
+#Connect to Science on a Sphere FTP server
+ftp = ftplib.FTP('public.sos.noaa.gov')
+#login anonymously 
+ftp.login() 
+
+#Change directory to the one you want. This one is for near realtime percip radar maps.
+ftp.cwd('/rt/precip/3600/')
+
+#Get filenames from directory and list as a reference if you want. Or you can comment out the print.
+filenames = ftp.nlst() # get filenames within the directory
+print(filenames)
+
+#For each filename, write to the directory entered. Here I just have the default '/Users/', but you should add the local directory you want to save too.  
+for filename in filenames:
+    local_filename = os.path.join('/Users/', filename)
+    file = open(local_filename, 'wb')
+    ftp.retrbinary('RETR '+ filename, file.write)
+    #Close file after writing.
+    file.close()
+#Quit the FTP Connection.
+ftp.quit()
+
+
+
+#Kernal 2
