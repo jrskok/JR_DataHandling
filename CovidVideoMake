@@ -1,0 +1,124 @@
+#Covid Confirmations
+
+#Get Daily Update:
+#https://data.humdata.org/dataset/novel-coronavirus-2019-ncov-cases
+#Download: time_series_2019-ncov-Confirmed.csv
+ConfirmedCSV_Path='Enter Path to time_series_2019-ncov-Confirmed.csv file'
+Image_Path='Enter path to save map of each day'
+Video_Path='Enter path to save video'
+
+#One Routine for Covid Confirm Plot
+#Load Libraries 
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt 
+from mpl_toolkits.basemap import Basemap
+import math 
+import os, sys, os.path
+import cv2
+import re
+
+#Plot data to Map and Save images
+#Need to update text file.
+#Read text file
+Confirm=pd.read_csv('ConfirmedCSV_Path')
+City=Confirm['Province/State'].tolist()
+Nation=Confirm['Country/Region'].tolist()
+C_Place = [(City[i], Nation[i]) for i in range(0, len(City))]
+#Get dates to plot
+C_Head=Confirm.columns.values.tolist()
+C_Dates=C_Head[4:]
+#Set number for image name
+num=0
+#Begin Plotting Routine
+for day in C_Dates:
+    #Get Location and data 
+    x=Confirm['Lat'].tolist()
+    y=Confirm['Long'].tolist()
+    data=Confirm[day].tolist()
+    data_sum=sum(data)
+    data_max=max(data)
+    M_Placein=Confirm[Confirm[day] == data_max].index[0]
+    Max_Place=C_Place[M_Placein]
+    Place=','.join(str(s) for s in Max_Place)
+    Max_Plot=math.log(data_max)*25
+    #Scale Data for plotting. Make non-zero data to log*25 (based on testing)
+    d = [math.log(x)*25 if x>0 else None for x in data]
+    #Set figure size to have good map resolution
+    fig = plt.figure(num=None, figsize=(100, 50))
+    m = Basemap(projection='cyl', llcrnrlat = -90, llcrnrlon = -180, urcrnrlat = 90, urcrnrlon = 180, resolution=None)
+    #Use bluemarble basemap
+    m.bluemarble()
+    #Check and clean up
+    lat = x
+    lon = y
+    x,y = m(lon, lat)
+    #plot scaled data
+    for x, y, d in zip(x, y, d):
+        m.plot(x, y, 'ro', markersize=d, alpha=0.4)
+    #Label dates    
+    Label1x=-57
+    Label1y=40
+    plt.text(Label1x, Label1y, day,fontsize=150,fontweight='bold',ha='left',va='center',color='w',bbox=dict(facecolor='w', alpha=0))   
+    #plt.text(Label1x, Label1y-7, 'World Cases:',fontsize=100,fontweight='bold',ha='left',va='center',color='w',bbox=dict(facecolor='w', alpha=0))   
+    #plt.text(Label1x, Label1y-12, data_sum,fontsize=100,fontweight='bold',ha='left',va='center',color='w',bbox=dict(facecolor='w', alpha=0))
+    #plt.text(Label1x, Label1y-17, 'Region Max:',fontsize=100,fontweight='bold',ha='left',va='center',color='w',bbox=dict(facecolor='w', alpha=0))
+    #plt.text(Label1x, Label1y-22,  Max_Place[0],fontsize=100,fontweight='bold',ha='left',va='center',color='w',bbox=dict(facecolor='w', alpha=0))
+    #plt.text(Label1x, Label1y-27,  data_max,fontsize=100,fontweight='bold',ha='left',va='center',color='w',bbox=dict(facecolor='w', alpha=0))
+    Label2x=144
+    Label2y=40
+    plt.text(Label2x, Label2y, day,fontsize=150,fontweight='bold',ha='left',va='center',color='w',bbox=dict(facecolor='w', alpha=0))   
+    #plt.text(Label2x, Label2y-7, 'Total Cases:',fontsize=100,fontweight='bold',ha='left',va='center',color='w',bbox=dict(facecolor='w', alpha=0))   
+    #plt.text(Label2x, Label2y-12, data_sum,fontsize=100,fontweight='bold',ha='left',va='center',color='w',bbox=dict(facecolor='w', alpha=0))
+    #plt.text(Label2x, Label2y-17, 'Region Max:',fontsize=100,fontweight='bold',ha='left',va='center',color='w',bbox=dict(facecolor='w', alpha=0))
+    #plt.text(Label2x, Label2y-22,  Max_Place[0],fontsize=100,fontweight='bold',ha='left',va='center',color='w',bbox=dict(facecolor='w', alpha=0))
+    #plt.text(Label2x, Label2y-27,  data_max,fontsize=100,fontweight='bold',ha='left',va='center',color='w',bbox=dict(facecolor='w', alpha=0))
+    Label3x=-150
+    Label3y=10
+    plt.text(Label3x-8, Label3y, 'Legend',fontsize=150,fontweight='bold',ha='left',va='center',color='w',bbox=dict(facecolor='w', alpha=0))
+    plt.text(Label3x, Label3y-8, '10 Cases:',fontsize=100,fontweight='bold',ha='left',va='center',color='w',bbox=dict(facecolor='w', alpha=0))
+    m.plot(Label3x-8, Label3y-8, 'ro', markersize=math.log(10)*25, alpha=1)
+    plt.text(Label3x, Label3y-19, '100 Cases:',fontsize=100,fontweight='bold',ha='left',va='center',color='w',bbox=dict(facecolor='w', alpha=0))
+    m.plot(Label3x-8, Label3y-19, 'ro', markersize=math.log(100)*25, alpha=1)
+    plt.text(Label3x, Label3y-30, str(data_max)+' Cases:',fontsize=100,fontweight='bold',ha='left',va='center',color='w',bbox=dict(facecolor='w', alpha=0))
+    m.plot(Label3x-8, Label3y-30, 'ro', markersize=math.log(data_max)*25, alpha=1)#Remove White Border
+    #Remove Whitespace
+    plt.gca().set_axis_off()
+    plt.subplots_adjust(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
+    plt.margins(0,0)
+    #Save File
+    plt.savefig(Image_Path+str(num)+'.png', transparent = True, bbox_inches='tight', pad_inches=0.0)
+    #Increase naming number
+    num=num+1
+    plt.close()
+
+#Make Movie
+#def sorting to handle image numbers correctly
+def natural_sort(l): 
+    convert = lambda text: int(text) if text.isdigit() else text.lower() 
+    alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
+    return sorted(l, key = alphanum_key)
+
+#Set image folder
+image_folder = Image_Path
+#Name video, will go to the directory of this program by default
+video_name =Video_Path+'CovidConfirm.avi'
+#Get list of images
+images = [img for img in os.listdir(image_folder) if img.endswith(".png")]
+#Sort images
+images=natural_sort(images)
+#Print and Confirm image order
+print(images)
+#Set video frame to the size of the images. 
+frame = cv2.imread(os.path.join(image_folder, images[0]))
+height, width, layers = frame.shape
+#write AVI
+video = cv2.VideoWriter(video_name, 0, 1, (width,height))
+for image in images:
+    video.write(cv2.imread(os.path.join(image_folder, image)))
+
+#Close video write
+cv2.destroyAllWindows()
+video.release()
+
+#This would create a large video (~1.5 GB), so I then use another program, such as Handbrake, to convert to a small (~4 mb) .mp4 file. 
