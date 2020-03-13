@@ -105,6 +105,13 @@ for day in C_Dates:
     plt.savefig('/Users/JR/Google Drive/Skok_ToDo/AR_EarthDataPlan/Earth_Datasets/2_Humanity/Covid/Covid_Images/'+str(num)+'.png', transparent = True, bbox_inches='tight', pad_inches=0.0, facecolor='black')
     ##Increase naming number
     num=num+1
+    ##Code to save scale bar as .png, Uncomment and run if needed, Each day might be on a different scale, we are using the last day until solved
+    #fig,ax = plt.subplots(figsize=(10, 5))
+    #mpb=m.scatter(x,y, s=d, c=d,alpha=0.8, cmap='YlOrRd')
+    #plt.colorbar(mpb,ax=ax)
+    #ax.remove()
+    #plt.savefig('/Users/JR/Google Drive/Skok_ToDo/AR_EarthDataPlan/Earth_Datasets/2_Humanity/Covid/LastDayTest_Scale.png',transparent = True, bbox_inches='tight', pad_inches=0.0)
+
     ##Close figure after saving to save memory
     plt.close()
 
