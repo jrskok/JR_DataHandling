@@ -26,7 +26,7 @@ import re
 ##Plot data to Map and Save images
 ##Need to update text file.
 ##Read text file
-Confirm=pd.read_csv('/Users/JR/Google Drive/Skok_ToDo/AR_EarthDataPlan/Earth_Datasets/2_Humanity/Covid/time_series_19-covid-Confirmed.csv')
+Confirm=pd.read_csv(ConfirmedCSV_Path+'time_series_19-covid-Confirmed.csv')
 City=Confirm['Province/State'].tolist()
 Nation=Confirm['Country/Region'].tolist()
 C_Place = [(City[i], Nation[i]) for i in range(0, len(City))]
@@ -53,7 +53,6 @@ for day in C_Dates:
     ##Set figure size to have good map resolution
     fig = plt.figure(num=None, figsize=(100, 50))
     m = Basemap(projection='cyl', llcrnrlat = -90, llcrnrlon = -180, urcrnrlat = 90, urcrnrlon = 180, resolution=None)
-
     ##Can use bluemarble basemap but have disabled to have black background for overlay instead
     #m.bluemarble()
     ##Set map, check this code. It is legacy, but J.R. doesn't understand it
@@ -102,7 +101,7 @@ for day in C_Dates:
     plt.subplots_adjust(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
     plt.margins(0,0)
     ##Save File
-    plt.savefig('/Users/JR/Google Drive/Skok_ToDo/AR_EarthDataPlan/Earth_Datasets/2_Humanity/Covid/Covid_Images/'+str(num)+'.png', transparent = True, bbox_inches='tight', pad_inches=0.0, facecolor='black')
+    plt.savefig(Image_Path+'+str(num)+'.png', transparent = True, bbox_inches='tight', pad_inches=0.0, facecolor='black')
     ##Increase naming number
     num=num+1
     ##Code to save scale bar as .png, Uncomment and run if needed, Each day might be on a different scale, we are using the last day until solved
@@ -110,7 +109,7 @@ for day in C_Dates:
     #mpb=m.scatter(x,y, s=d, c=d,alpha=0.8, cmap='YlOrRd')
     #plt.colorbar(mpb,ax=ax)
     #ax.remove()
-    #plt.savefig('/Users/JR/Google Drive/Skok_ToDo/AR_EarthDataPlan/Earth_Datasets/2_Humanity/Covid/LastDayTest_Scale.png',transparent = True, bbox_inches='tight', pad_inches=0.0)
+    #plt.savefig(ConfirmedCSV_Path+LastDayTest_Scale.png',transparent = True, bbox_inches='tight', pad_inches=0.0)
 
     ##Close figure after saving to save memory
     plt.close()
@@ -123,9 +122,9 @@ def natural_sort(l):
     return sorted(l, key = alphanum_key)
 
 ##Set image folder
-image_folder = '/Users/JR/Google Drive/Skok_ToDo/AR_EarthDataPlan/Earth_Datasets/2_Humanity/Covid/Covid_Images'
+image_folder = Image_Path
 ##Name video, will go to the directory of this program by default
-video_name = '/Users/JR/Google Drive/Skok_ToDo/AR_EarthDataPlan/Earth_Datasets/2_Humanity/Covid/CovidConfirm.avi'
+video_name = Video_Path+'CovidConfirm.avi'
 ##Get list of images
 images = [img for img in os.listdir(image_folder) if img.endswith(".png")]
 ##Sort images
